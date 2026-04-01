@@ -1,0 +1,38 @@
+# Entorno virtual
+  venv/
+  .venv/
+
+  # Variables de entorno (NUNCA subir credenciales)
+  .env
+
+  # Python
+  __pycache__/
+  *.pyc
+  *.pyo
+  *.egg-info/
+  dist/
+  build/
+
+  # Datos temporales
+  data/*.json
+  data/*.csv
+  logs/*.log
+
+  # IDE
+  .vscode/
+  .idea/
+
+  # Docker
+  *.log
+
+  # Great Expectations
+  great_expectations/uncommitted/
+
+  # dbt
+  dbt_project/target/
+  dbt_project/dbt_packages/
+  dbt_project/logs/
+
+  # OS
+  .DS_Store
+  Thumbs.db
