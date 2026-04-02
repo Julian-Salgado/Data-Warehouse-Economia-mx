@@ -1,0 +1,136 @@
+Abre el Bloc de Notas y pega este contenido:
+
+  ================================================================================
+          DISEÑO DEL DATA WAREHOUSE — FASE 1 COMPLETADA
+  ================================================================================
+
+  Fecha: 01/04/2026
+
+  ================================================================================
+                      1.1 FUENTES DE DATOS VERIFICADAS
+  ================================================================================
+
+  BANXICO (Banco de México)
+    API: https://www.banxico.org.mx/SieAPIRest/service/v1/
+    Token: Sí (guardado)
+    Indicadores:
+      - SF43718: Tipo de cambio USD/MXN (diaria, formato fecha dd/mm/aaaa)
+      - SF61745: Tasa TIIE / Tasa objetivo (cuando cambia política)
+      - SP1: Inflación mensual / INPC (mensual)
+    Estructura respuesta: bmx → series → [0] → datos → [{fecha, dato}]
+    Nota: Los valores vienen como texto, hay que convertir a número
+
+  INEGI (Instituto Nacional de Estadística y Geografía)
+    API: https://www.inegi.org.mx/app/api/indicadores/desarrolladores/
+    IMPORTANTE: INEGI migró de BIE a BISE en diciembre 2025
+    URL actual: .../INDICATOR/{CODE}/es/00/false/BISE/2.0/{TOKEN}?type=json
+    Token: Sí (guardado)
+    Indicadores:
+      - 6207136901: IGAE - Actividad Económica (mensual, formato fecha aaaa/mm)
+      - 6200093973: Población desocupada 15+ años (trimestral)
+    Estructura respuesta: Series → [0] → OBSERVATIONS → [{TIME_PERIOD, OBS_VALUE}]
+    Nota: Devuelve todo el historial, hay que filtrar por fecha
+
+  YAHOO FINANCE
+    Librería: yfinance (Python)
+    Token: No necesita
+    Indicadores:
+      - CL=F: Petróleo WTI (diaria, USD/barril)
+      - ^MXX: IPC Bolsa Mexicana (diaria, puntos)
+      - GC=F: Oro (diaria, USD/onza)
+    Estructura: DataFrame con columnas Close, High, Low, Open, Volume
+    Nota: Formato de fecha ya viene estándar (aaaa-mm-dd), valores numéricos
+
+  OPENSKY
+    API: https://opensky-network.org/api/states/all
+    Token: No necesita
+    Parámetros México: lamin=14.5&lamax=32.7&lomin=-118.4&lomax=-86.7
+    Datos: Lista de aviones con posición, velocidad, altitud, país de origen
+    Nota: Datos en tiempo real, se consulta bajo demanda
+
+  Total: 9 indicadores de 4 fuentes
+
+  ================================================================================
+                      1.2 MODELO DIMENSIONAL
+  ================================================================================
+
+  Tipo: Star Schema (esquema de estrella)
+
+  --- DIMENSIONES ---
+
+  dim_fecha
+    - fecha (DATE, PK)
+    - anio (INTEGER)
+    - mes (INTEGER)
+    - dia (INTEGER)
+    - dia_semana (INTEGER)
+    - nombre_mes (VARCHAR)
+    - trimestre (INTEGER)
+    - es_fin_de_semana (BOOLEAN)
+    - es_dia_festivo (BOOLEAN)
+
+  dim_indicador
+    - indicador_id (SERIAL, PK)
+    - nombre (VARCHAR) — ej: tipo_cambio_usd_mxn
+    - descripcion (VARCHAR)
+    - fuente (VARCHAR) — ej: banxico
+    - unidad (VARCHAR) — ej: MXN por USD
+    - frecuencia (VARCHAR) — ej: diaria
+
+  dim_fuente
+    - fuente_id (SERIAL, PK)
+    - nombre (VARCHAR) — ej: Banxico
+    - url_api (VARCHAR)
+    - descripcion (VARCHAR)
+    - requiere_token (BOOLEAN)
+
+  --- HECHOS ---
+
+  fact_indicadores_economicos
+    - id (SERIAL, PK)
+    - fecha (DATE, FK → dim_fecha)
+    - indicador_id (INTEGER, FK → dim_indicador)
+    - fuente_id (INTEGER, FK → dim_fuente)
+    - valor (NUMERIC)
+    - valor_anterior (NUMERIC)
+    - variacion_porcentual (NUMERIC)
+    - fecha_extraccion (TIMESTAMP)
+
+  fact_trafico_aereo
+    - id (SERIAL, PK)
+    - fecha (DATE, FK → dim_fecha)
+    - fuente_id (INTEGER, FK → dim_fuente)
+    - total_aviones (INTEGER)
+    - en_vuelo (INTEGER)
+    - en_tierra (INTEGER)
+    - velocidad_promedio (NUMERIC)
+    - altitud_promedio (NUMERIC)
+    - pais_mas_frecuente (VARCHAR)
+    - fecha_extraccion (TIMESTAMP)
+
+  ================================================================================
+                      1.3 CAPAS DE TRANSFORMACION (dbt)
+  ================================================================================
+
+  STAGING (limpieza, 1 modelo por fuente):
+    - stg_banxico_tipo_cambio
+    - stg_banxico_tasa_interes
+    - stg_banxico_inflacion
+    - stg_inegi_igae
+    - stg_inegi_desempleo
+    - stg_yahoo_petroleo
+    - stg_yahoo_ipc_bolsa
+    - stg_yahoo_oro
+    - stg_opensky_trafico
+
+  INTERMEDIATE (combinación y cálculos):
+    - int_indicadores_diarios (une todos los indicadores por fecha)
+    - int_trafico_aereo_diario (resumen diario de tráfico)
+    - int_indicadores_con_variaciones (variación %, promedios móviles 7d y 30d)
+
+  MARTS (modelo dimensional final):
+    - dim_fecha
+    - dim_indicador
+    - dim_fuente
+    - fact_indicadores_economicos
+    - fact_trafico_aereo
