@@ -232,10 +232,9 @@ def cargar_opensky(conexion):
 
     cursor = conexion.cursor()
 
-    resumen = datos.get("resumen", {})
+    resumen = datos
     fecha = datos.get(
-        "fecha_consulta",
-        datetime.now().strftime("%Y-%m-%d")
+        "fecha_consulta", datetime.now().strftime("%Y-%m-%d")
     )
 
     cursor.execute(
@@ -254,8 +253,8 @@ def cargar_opensky(conexion):
                 str(resumen.get("total_aviones", "")),
                 str(resumen.get("en_vuelo", "")),
                 str(resumen.get("en_tierra", "")),
-                str(resumen.get("velocidad_promedio", "")),
-                str(resumen.get("altitud_promedio", "")),
+                str(resumen.get("velocidad_promedio_kmh", "")),
+                str(resumen.get("altitud_promedio_m", "")),
                 str(resumen.get("pais_mas_frecuente", ""))
             )
         )

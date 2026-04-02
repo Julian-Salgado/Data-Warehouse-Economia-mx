@@ -1,0 +1,44 @@
+# Sources: le dicen a dbt dónde están los datos crudos (esquema raw)
+# Sin este archivo, dbt no sabe que las tablas raw existen.
+# Después, en los modelos SQL, usamos {{ source('raw', 'nombre_tabla') }}
+# para referenciarlas.
+
+version: 2
+
+sources:
+  - name: raw
+    database: data_warehouse_economia
+    schema: raw
+    description: "Datos crudos extraídos de las 4 APIs"
+
+    tables:
+      # --- Banxico ---
+      - name: banxico_tipo_cambio
+        description: "Tipo de cambio USD/MXN (serie SF43718)"
+
+      - name: banxico_tasa_interes
+        description: "Tasa de interés TIIE (serie SF61745)"
+
+      - name: banxico_inflacion
+        description: "Inflación mensual INPC (serie SP1)"
+
+      # --- INEGI ---
+      - name: inegi_igae
+        description: "Indicador Global de Actividad Económica"
+
+      - name: inegi_desempleo
+        description: "Población desocupada 15+ años"
+
+      # --- Yahoo Finance ---
+      - name: yahoo_petroleo
+        description: "Precio del petróleo WTI (CL=F)"
+
+      - name: yahoo_ipc_bolsa
+        description: "IPC Bolsa Mexicana (^MXX)"
+
+      - name: yahoo_oro
+        description: "Precio del oro (GC=F)"
+
+      # --- OpenSky ---
+      - name: opensky_trafico
+        description: "Tráfico aéreo sobre México"

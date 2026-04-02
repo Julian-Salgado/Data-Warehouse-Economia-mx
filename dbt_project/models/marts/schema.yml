@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: dim_fecha
+    description: "Dimensión de fechas con año, mes, trimestre, festivos"
+    columns:
+      - name: fecha
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_indicador
+    description: "Catálogo de los 8 indicadores económicos"
+    columns:
+      - name: indicador_id
+        tests:
+          - unique
+          - not_null
+      - name: nombre
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_fuente
+    description: "Catálogo de las 4 fuentes de datos"
+    columns:
+      - name: fuente_id
+        tests:
+          - unique
+          - not_null
+      - name: nombre
+        tests:
+          - unique
+          - not_null
+
+  - name: fact_indicadores_economicos
+    description: "Tabla de hechos con todos los indicadores y sus variaciones"
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null
+      - name: fecha
+        tests:
+          - not_null
+      - name: valor
+        tests:
+          - not_null
+
+  - name: fact_trafico_aereo
+    description: "Tabla de hechos de tráfico aéreo sobre México"
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null

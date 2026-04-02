@@ -1,0 +1,34 @@
+# Configuración del proyecto dbt para el Data Warehouse de Economía Mexicana
+
+name: 'dbt_economia'
+version: '1.0.0'
+
+# Este profile apunta a la conexión que configuramos en profiles.yml
+profile: 'dbt_economia'
+
+# Dónde buscar los modelos SQL
+model-paths: ["models"]
+
+# Dónde buscar los tests
+test-paths: ["tests"]
+
+# Dónde guardar archivos compilados (dbt los genera automáticamente)
+target-path: "target"
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  dbt_economia:
+    staging:
+      +schema: staging
+      +materialized: view
+
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+
+    marts:
+      +schema: marts
+      +materialized: table
