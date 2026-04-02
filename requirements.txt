@@ -1,0 +1,9 @@
+requests
+pandas
+yfinance
+psycopg2-binary
+python-dotenv
+sqlalchemy
+dbt-postgres
+great-expectations
+apache-airflow
