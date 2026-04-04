@@ -6,4 +6,3 @@ python-dotenv
 sqlalchemy
 dbt-postgres
 great-expectations
-apache-airflow
