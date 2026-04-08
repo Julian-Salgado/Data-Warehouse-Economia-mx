@@ -255,6 +255,12 @@ data-warehouse-economia-mx/
 
 ---
 
+## Licencia
+
+MIT — ver [LICENSE](LICENSE).
+
+---
+
 ## Contacto
 
 **Julian Flores Salgado**
