@@ -267,5 +267,5 @@ MIT — ver [LICENSE](LICENSE).
 Ingeniero en Sistemas Computacionales — Tecnológico Nacional de México
 Data Engineer · Python Developer
 
+📧 **juliianfs10@gmail.com**  
 🔗 **[LinkedIn](https://www.linkedin.com/in/julian-flores-salgado)**
-[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:juliianfs10@gmail.com)
